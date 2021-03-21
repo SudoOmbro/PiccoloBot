@@ -120,8 +120,8 @@ if __name__ == "__main__":
         PiccoloDare("{1}, {2} lingering start ({d})", 2, "{1}, {2} lingering end ({d})", 2)
     ]
     players = ["jhon", "elia", "matt"]
-    game = PiccoloGame(test_dares, players, 1)
-    print(game.do_turn())
-    print(game.do_turn())
-    print(game.do_turn())
+    rounds = 2
+    game = PiccoloGame(test_dares, players, rounds)
+    for i in range(len(players) * rounds):
+        print(game.do_turn())
     print(game.do_turn())

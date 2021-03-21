@@ -53,23 +53,37 @@ class PiccoloGame:
                 self.lingering_dares.remove(dare)
 
     def _check_lingering_dares(self) -> List[(List[PiccoloDare], List[str])]:
+        """ checks if there are any lingering dares that expired """
         expired_dares: (List[PiccoloDare], List[str]) = []
-        dares_to_remove: List[(List[PiccoloDare], int, List[str])] = []
+        dares_to_remove: List[List[PiccoloDare, int, List[str]]] = []
         for dare in self.lingering_dares:
             if dare[1] == 0:
                 dares_to_remove.append(dare)
                 expired_dares.append((dare[0], dare[2]))
+            else:
+                dares_to_remove[1] -= 1
         return expired_dares
 
     def do_turn(self) -> List[(List[PiccoloDare], List[str])] or None:
         """ :returns the list of dares to show or None if the game is finished """
         dares_to_return: List[(List[PiccoloDare], List[str])] = []
+        # return None if the game is finished
         if len(self.dares):
             return None
-        next_dare = self.dares[0]
-        dares_to_return.append((next_dare, sample(self.players, next_dare.involved_players)))
-        self.dares.pop(0)
+        # get next dare
+        next_dare: PiccoloDare = self.dares[0]
+        # get involved players
+        involved_players: List[str] = sample(self.players, next_dare.involved_players)
+        # add the next dare to the dares to return
+        dares_to_return.append((next_dare, involved_players))
+        # if the next dare has a duration, add it to the lingering dares
+        if next_dare.duration != 0:
+            self.lingering_dares.append([next_dare, next_dare.duration, involved_players])
+        # check if any lingering dare expired
         expired_dares = self._check_lingering_dares()
+        # add expired lingering dares to dares to return
         if len(expired_dares) != 0:
             dares_to_return.extend(expired_dares)
+        # remove next dare from dare queue
+        self.dares.pop(0)
         return dares_to_return

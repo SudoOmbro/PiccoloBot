@@ -80,6 +80,7 @@ class PiccoloGame:
                 expired_dares.append(dare[0].get_end_text(dare[2]))
             else:
                 dare[1] -= 1
+        self._remove_expired_dares(dares_to_remove)
         return expired_dares
 
     def do_turn(self) -> List[str] or None:

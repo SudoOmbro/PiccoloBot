@@ -26,20 +26,6 @@ class States(Enum):
     EDIT_DARE_ATTRIBUTE = auto()
 
 
-TEST_DARE_POOL = [
-
-    PiccoloDare("{1} tocca il coccige di {2}, se si rifiuta beve 1 sorso.", 0, None, 2),
-    PiccoloDare("{1} bacia a stampo {2}, se si rifiuta beve 2 sorsi.", 0, None, 2),
-    PiccoloDare("{1} massaggia {2} fino a nuovo ordine", 4, "{1} puo' smettere di massaggiare {2}", 2),
-    PiccoloDare("{1} e {2} leccano le orecchie a {3}, chi si rifuta beve 5 sorsi.", 0, None, 3),
-    PiccoloDare("Mangiare un cucchiaio di unghie o di capelli? Chi e' in minoranza beva 3 sorsi", 0, None, 0),
-    PiccoloDare("{1} si toglie un indumento a sua scelta, se si rifiuta beve 3 sorsi.", 0, None, 1),
-    PiccoloDare("{1} e {2} simulano una posizione sessuale a loro scelta. Se si rifitano bevono 4 sorsi.", 0, None, 2),
-    PiccoloDare("{1} cerca nelle chat il primo messaggio con la parola scopare. Se si rifuta beve 3 sorsi.", 0, None, 2)
-
-]
-
-
 def game_entrypoint_handler(update, context):
     delete_callback_message(update, context)
     send_message(

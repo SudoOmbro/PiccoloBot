@@ -2,7 +2,7 @@ from telegram.ext import Updater, ConversationHandler, CallbackQueryHandler, Com
 
 from telegram_stuff.bot_menu_handlers import game_start_handler, in_game_handler, States, end_command_handler, \
     start_command_handler, game_entrypoint_handler, edit_entrypoint_handler, add_dare_handler, edit_dare_menu_handler, \
-    edit_dare_attribute_handler, show_all_dares_handler
+    edit_dare_attribute_handler, show_all_dares_handler, about_command_handler
 
 
 class PiccoloBot:
@@ -32,8 +32,10 @@ class PiccoloBot:
         )
 
         self.updater.dispatcher.add_handler(CommandHandler("start", start_command_handler))
+        self.updater.dispatcher.add_handler(CommandHandler("about", about_command_handler))
         self.updater.dispatcher.add_handler(game_conversation_handler)
         self.updater.dispatcher.add_handler(edit_dares_conversation_handler)
+
 
     def start(self):
         self.updater.start_polling()

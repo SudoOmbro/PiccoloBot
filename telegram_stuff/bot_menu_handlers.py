@@ -97,7 +97,7 @@ def game_start_handler(update, context):
     text = update.message.text
     players = text.split("\n")
     game: PiccoloGame = PiccoloGame(
-        Globals.DARES,
+        Globals.DARES.pool,
         players,
         7
     )
@@ -126,6 +126,20 @@ def in_game_handler(update, context):
 
 def start_command_handler(update, context):
     send_main_menu(update, context)
+
+
+def about_command_handler(update, context):
+    send_message(
+        update,
+        context,
+        text="Bot built by @LordOmbro\n\n"
+             "[\U00002615 Buy me a coffee!](https://www.paypal.com/donate?hosted_button_id=UBNSEND5E96H2)\n\n"
+             "The code of the bot is open source and hosted [here](https://github.com/SudoOmbro/PiccoloBot)\n\n"
+             "Contacts:\n"
+             "[Github](https://github.com/SudoOmbro)\n"
+             "[Instagram](https://www.instagram.com/_m_o_r_b_o_/)",
+        preview_off=True
+    )
 
 
 def end_command_handler(update, context):

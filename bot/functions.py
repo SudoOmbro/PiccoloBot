@@ -4,7 +4,8 @@ from telegram.error import BadRequest
 
 from telegram import ParseMode, TelegramError
 
-from bot.resources import main_keyboard
+from bot.resources import main_keyboard, main_keyboard_admin, main_edit_keyboard, edit_dare_keyboard
+from utils.globals import Globals
 
 logging.basicConfig(
     format='%(asctime)s - {%(pathname)s} %(levelname)s - %(message)s',
@@ -74,9 +75,24 @@ def send_main_menu(update, context):
         update,
         context,
         text="Choose what you want to do",
-        keyboard=main_keyboard
+        keyboard=main_keyboard_admin if update.effective_user.id in Globals.admins_list else main_keyboard
     )
 
 
 def send_edit_menu(update, context):
-    pass
+    send_message(
+        update,
+        context,
+        text="Welcome to the edit menu, that do you want to do?",
+        keyboard=main_edit_keyboard
+    )
+
+
+def send_edit_dare_menu(update, context):
+    string = ""  # TODO
+    send_message(
+        update,
+        context,
+        text=string,
+        keyboard=edit_dare_keyboard
+    )

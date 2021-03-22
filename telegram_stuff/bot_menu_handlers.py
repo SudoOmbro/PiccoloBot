@@ -1,3 +1,5 @@
+import logging
+import traceback
 from enum import Enum, auto
 
 from telegram.ext import ConversationHandler
@@ -6,6 +8,14 @@ from telegram_stuff.functions import send_message, delete_callback_message, send
 from telegram_stuff.resources import ingame_keyboard
 from piccolo.game import PiccoloGame, PiccoloDare
 from utils.globals import Globals
+
+
+logging.basicConfig(
+    format='%(asctime)s - {%(pathname)s} %(levelname)s - %(message)s',
+    datefmt='%H:%M:%S'
+)
+
+log = logging.getLogger(__name__)
 
 
 class States(Enum):
@@ -22,7 +32,7 @@ TEST_DARE_POOL = [
     PiccoloDare("{1} bacia a stampo {2}, se si rifiuta beve 2 sorsi.", 0, None, 2),
     PiccoloDare("{1} massaggia {2} fino a nuovo ordine", 4, "{1} puo' smettere di massaggiare {2}", 2),
     PiccoloDare("{1} e {2} leccano le orecchie a {3}, chi si rifuta beve 5 sorsi.", 0, None, 3),
-    PiccoloDare("Mangiare un cucchiaio di unghie o dicapelli? Chi e' in minoranza beva 3 sorsi", 0, None, 0),
+    PiccoloDare("Mangiare un cucchiaio di unghie o di capelli? Chi e' in minoranza beva 3 sorsi", 0, None, 0),
     PiccoloDare("{1} si toglie un indumento a sua scelta, se si rifiuta beve 3 sorsi.", 0, None, 1),
     PiccoloDare("{1} e {2} simulano una posizione sessuale a loro scelta. Se si rifitano bevono 4 sorsi.", 0, None, 2),
     PiccoloDare("{1} cerca nelle chat il primo messaggio con la parola scopare. Se si rifuta beve 3 sorsi.", 0, None, 2)
@@ -146,3 +156,14 @@ def end_command_handler(update, context):
     send_message(update, context, text="Conversation ended")
     send_main_menu(update, context)
     return ConversationHandler.END
+
+
+def error_handler(update, context):
+    """Log Errors caused by Updates."""
+    log.error(
+        'with user: "%s (%s)"\nmessage: "%s"\ntraceback: %s',
+        update.effective_user,
+        update.effective_user.id,
+        context.error,
+        traceback.format_exc()
+    )

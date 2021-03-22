@@ -4,6 +4,7 @@ from telegram.error import BadRequest
 
 from telegram import ParseMode, TelegramError
 
+from bot.resources import main_keyboard
 
 logging.basicConfig(
     format='%(asctime)s - {%(pathname)s} %(levelname)s - %(message)s',
@@ -26,6 +27,18 @@ def send_message(update, context, text, keyboard=None, preview_off=False, markdo
         log.warning(f"Can't send a message to {update.effective_user.id}")
     except BadRequest:
         log.warning(f"Can't send a message to {update.effective_user.id}, chat not found")
+
+
+def delete_callback_message(update, context):
+    try:
+        context.bot.delete_message(
+            chat_id=update.effective_user.id,
+            message_id=update.callback_query.message.message_id
+        )
+    except TelegramError:
+        pass
+    except AttributeError:
+        pass
 
 
 def delete_message(message_id, chat_id, context):
@@ -51,4 +64,15 @@ def delete_last_message(update, context):
         update.message.message_id,
         update.effective_user.id,
         context
+    )
+
+
+# SHORTCUTS -------------------------------------------------------
+
+def send_main_menu(update, context):
+    send_message(
+        update,
+        context,
+        text="Choose what you want to do",
+        keyboard=main_keyboard
     )

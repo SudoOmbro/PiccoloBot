@@ -65,7 +65,7 @@ def in_game_handler(update, context):
         return States.IN_GAME
     else:
         send_message(update, context, text="Game ended")
-        # TODO send main menu
+        send_main_menu(update, context)
         return ConversationHandler.END
 
 

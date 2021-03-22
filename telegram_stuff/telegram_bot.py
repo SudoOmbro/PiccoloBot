@@ -1,13 +1,11 @@
 from telegram.ext import Updater, ConversationHandler, CallbackQueryHandler, CommandHandler, MessageHandler, Filters
 
-from bot.bot_menu_handlers import game_start_handler, in_game_handler, States, end_command_handler, \
-    start_command_handler, game_entrypoint_handler
-from piccolo.game import DaresCollection
+from telegram_stuff.bot_menu_handlers import game_start_handler, in_game_handler, States, end_command_handler, \
+    start_command_handler, game_entrypoint_handler, edit_entrypoint_handler, add_dare_handler, edit_dare_menu_handler, \
+    edit_dare_attribute_handler, show_all_dares_handler
 
 
-class Bot:
-
-    DARES = DaresCollection("dares")
+class PiccoloBot:
 
     def __init__(self, token: str):
         self.updater = Updater(token, use_context=True)
@@ -22,7 +20,15 @@ class Bot:
         )
 
         edit_dares_conversation_handler = ConversationHandler(
-
+            entry_points=[CallbackQueryHandler(edit_entrypoint_handler, pattern="edit")],
+            states={
+                States.MAIN_EDIT_MENU: [CallbackQueryHandler(add_dare_handler, pattern="add"),
+                                        CallbackQueryHandler(show_all_dares_handler, pattern="show"),
+                                        CallbackQueryHandler(end_command_handler, pattern="back")],
+                States.EDIT_DARE_MENU: [CallbackQueryHandler(edit_dare_menu_handler)],
+                States.EDIT_DARE_ATTRIBUTE: [MessageHandler(Filters.text, edit_dare_attribute_handler)]
+            },
+            fallbacks=[CommandHandler("end", end_command_handler)]
         )
 
         self.updater.dispatcher.add_handler(CommandHandler("start", start_command_handler))

@@ -47,7 +47,7 @@ class PiccoloDare:
         return self._format(self.end_text, players)
 
     def __str__(self):
-        return f"duration: {self.duration}\nstart text: {self.start_text}\n" \
+        return f"duration: {self.duration} + {self.wiggle}\nstart text: {self.start_text}\n" \
                f"end text: {self.end_text}\ninvolved players: {self.involved_players}"
 
 
@@ -59,11 +59,14 @@ class DaresCollection:
         json_data: dict or None = load_json(filename)
         if json_data is not None:
             for dare_dict in json_data["dares"]:
-                self.add_dare(dare_dict)
+                self.add_dare_from_dict(dare_dict)
         else:
             self.save()
 
-    def add_dare(self, dare_dict: dict):
+    def add_dare(self, dare: PiccoloDare):
+        self.pool.append(dare)
+
+    def add_dare_from_dict(self, dare_dict: dict):
         dare: PiccoloDare = PiccoloDare()
         dare.load_from_json(dare_dict)
         self.pool.append(dare)
@@ -85,6 +88,7 @@ class DaresCollection:
         pos: int = 0
         for dare in self.pool:
             string += f"dare {pos}:\n{dare}\n\n"
+            pos += 1
         return string
 
 

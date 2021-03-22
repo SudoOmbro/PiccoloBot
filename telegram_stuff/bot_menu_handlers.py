@@ -2,9 +2,10 @@ from enum import Enum, auto
 
 from telegram.ext import ConversationHandler
 
-from bot.functions import send_message, delete_callback_message, send_main_menu, send_edit_menu
-from bot.resources import ingame_keyboard
+from telegram_stuff.functions import send_message, delete_callback_message, send_main_menu, send_edit_menu, send_edit_dare_menu
+from telegram_stuff.resources import ingame_keyboard
 from piccolo.game import PiccoloGame, PiccoloDare
+from utils.globals import Globals
 
 
 class States(Enum):
@@ -12,7 +13,7 @@ class States(Enum):
     IN_GAME = auto()
     MAIN_EDIT_MENU = auto()
     EDIT_DARE_MENU = auto()
-    GET_DARE_ATTRIBUTE = auto()
+    EDIT_DARE_ATTRIBUTE = auto()
 
 
 TEST_DARE_POOL = [
@@ -45,11 +46,58 @@ def edit_entrypoint_handler(update, context):
     return States.MAIN_EDIT_MENU
 
 
+def add_dare_handler(update, context):
+    context.chat_data["dare"] = PiccoloDare()
+    delete_callback_message(update, context)
+    send_edit_dare_menu(update, context)
+    return States.EDIT_DARE_MENU
+
+
+def show_all_dares_handler(update, context):
+    delete_callback_message(update, context)
+    send_message(update, context, text=f"saved dares:\n\n{Globals.DARES}")
+    send_edit_menu(update, context)
+    return States.MAIN_EDIT_MENU
+
+
+def edit_dare_menu_handler(update, context):
+    cdata: str = update.callback_query.data
+    delete_callback_message(update, context)
+    if cdata == "save":
+        Globals.DARES.add_dare(context.chat_data["dare"])
+        Globals.DARES.save()
+        send_edit_menu(update, context)
+        return States.MAIN_EDIT_MENU
+    else:
+        context.chat_data["field"] = cdata
+        field = cdata.replace("_", " ")
+        send_message(update, context, text=f"write the new value for {field}")
+        return States.EDIT_DARE_ATTRIBUTE
+
+
+def edit_dare_attribute_handler(update, context):
+    text: str = update.message.text
+    field: str = context.chat_data["field"]
+    dare: PiccoloDare = context.chat_data["dare"]
+    field_type = type(dare.__dict__[field])
+    if field_type == int:
+        try:
+            dare.__dict__[field] = int(text)
+            send_edit_dare_menu(update, context)
+            return States.EDIT_DARE_MENU
+        except TypeError:
+            send_message(update, context, text="Send a valid number")
+    else:
+        dare.__dict__[field] = text
+        send_edit_dare_menu(update, context)
+        return States.EDIT_DARE_MENU
+
+
 def game_start_handler(update, context):
     text = update.message.text
     players = text.split("\n")
     game: PiccoloGame = PiccoloGame(
-        TEST_DARE_POOL,
+        Globals.DARES,
         players,
         7
     )
@@ -81,5 +129,6 @@ def start_command_handler(update, context):
 
 
 def end_command_handler(update, context):
-    # TODO finish this
+    send_message(update, context, text="Conversation ended")
+    send_main_menu(update, context)
     return ConversationHandler.END

@@ -4,7 +4,7 @@ from telegram.error import BadRequest
 
 from telegram import ParseMode, TelegramError
 
-from bot.resources import main_keyboard, main_keyboard_admin, main_edit_keyboard, edit_dare_keyboard
+from telegram_stuff.resources import main_keyboard, main_keyboard_admin, main_edit_keyboard, edit_dare_keyboard
 from utils.globals import Globals
 
 logging.basicConfig(
@@ -83,13 +83,15 @@ def send_edit_menu(update, context):
     send_message(
         update,
         context,
-        text="Welcome to the edit menu, that do you want to do?",
+        text=f"Welcome to the edit menu!\n\n"
+             f"there are currently *{len(Globals.DARES.pool)} saved dares*\n\n"
+             f"what do you want to do?",
         keyboard=main_edit_keyboard
     )
 
 
 def send_edit_dare_menu(update, context):
-    string = ""  # TODO
+    string = f"dare editor:\n\n{context.chat_data['dare']}"
     send_message(
         update,
         context,

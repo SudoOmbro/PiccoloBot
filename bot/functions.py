@@ -76,3 +76,7 @@ def send_main_menu(update, context):
         text="Choose what you want to do",
         keyboard=main_keyboard
     )
+
+
+def send_edit_menu(update, context):
+    pass

@@ -1,15 +1,31 @@
 from copy import copy
-from random import shuffle, sample
+from random import shuffle, sample, randint
 from typing import List
+
+from utils.filesystem import load_json, save_json
 
 
 class PiccoloDare:
 
-    def __init__(self, start_text: str, duration: int, end_text: str or None, involved_players: int):
-        self.duration: int = duration
-        self.start_text: str = start_text
-        self.end_text: str = end_text
-        self.involved_players: int = involved_players
+    def __init__(
+            self,
+            start_text: str = "",
+            duration: int = 0,
+            end_text: str or None = None,
+            involved_players: int = 0,
+            wiggle: int = 0
+    ):
+        self.duration: int = duration  # the duration of the dare
+        self.start_text: str = start_text  # the text that comes out at the start of the dare
+        self.end_text: str = end_text  # the text that comes out at the end of the dare
+        self.involved_players: int = involved_players  # the number of involved players
+        self.wiggle: int = wiggle  # the wiggle room to the duration (duration + wiggle = max duration)
+
+    def load_from_json(self, json_data: dict):
+        self.__dict__.update(json_data)
+
+    def dump_to_json(self):
+        return self.__dict__
 
     def _format(self, text: str, players: List[str]) -> str:
         """ format the given text with the names of the players involved and with the duration if present """
@@ -33,6 +49,43 @@ class PiccoloDare:
     def __str__(self):
         return f"duration: {self.duration}\nstart text: {self.start_text}\n" \
                f"end text: {self.end_text}\ninvolved players: {self.involved_players}"
+
+
+class DaresCollection:
+
+    def __init__(self, filename: str):
+        self.filename: str = filename
+        self.pool: List[PiccoloDare] = []
+        json_data: dict or None = load_json(filename)
+        if json_data is not None:
+            for dare_dict in json_data["dares"]:
+                self.add_dare(dare_dict)
+        else:
+            self.save()
+
+    def add_dare(self, dare_dict: dict):
+        dare: PiccoloDare = PiccoloDare()
+        dare.load_from_json(dare_dict)
+        self.pool.append(dare)
+
+    def delete_dare(self, index: int):
+        self.pool.pop(index)
+
+    def save(self):
+        pool: List[dict] = []
+        for dare in self.pool:
+            pool.append(dare.dump_to_json())
+        json_data: dict = {
+            "dares": pool
+        }
+        save_json(json_data, self.filename)
+
+    def __str__(self):
+        string: str = ""
+        pos: int = 0
+        for dare in self.pool:
+            string += f"dare {pos}:\n{dare}\n\n"
+        return string
 
 
 class PiccoloGame:
@@ -97,7 +150,10 @@ class PiccoloGame:
         dares_to_return.append(next_dare.get_start_text(involved_players))
         # if the next dare has a duration, add it to the lingering dares
         if next_dare.duration != 0:
-            self.lingering_dares.append([next_dare, next_dare.duration, involved_players])
+            self.lingering_dares.append([
+                next_dare,
+                next_dare.duration if next_dare.wiggle == 0 else next_dare.duration + randint(0, next_dare.wiggle),
+                involved_players])
         # check if any lingering dare expired
         expired_dares = self._check_lingering_dares()
         # add expired lingering dares to dares to return

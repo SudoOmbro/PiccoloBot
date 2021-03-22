@@ -2,7 +2,7 @@ from enum import Enum, auto
 
 from telegram.ext import ConversationHandler
 
-from bot.functions import send_message, delete_callback_message, send_main_menu
+from bot.functions import send_message, delete_callback_message, send_main_menu, send_edit_menu
 from bot.resources import ingame_keyboard
 from piccolo.game import PiccoloGame, PiccoloDare
 
@@ -11,7 +11,8 @@ class States(Enum):
     GET_PLAYERS = auto()
     IN_GAME = auto()
     MAIN_EDIT_MENU = auto()
-    GET_TEXT = auto()
+    EDIT_DARE_MENU = auto()
+    GET_DARE_ATTRIBUTE = auto()
 
 
 TEST_DARE_POOL = [
@@ -36,6 +37,12 @@ def game_entrypoint_handler(update, context):
         text="Send the name of the players on different lines",
     )
     return States.GET_PLAYERS
+
+
+def edit_entrypoint_handler(update, context):
+    delete_callback_message(update, context)
+    send_edit_menu(update, context)
+    return States.MAIN_EDIT_MENU
 
 
 def game_start_handler(update, context):

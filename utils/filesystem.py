@@ -1,9 +1,13 @@
 import json
+import os
 
 
 def load_json(filename: str):
-    with open(f"{filename}.json", "r") as f:
-        return json.load(f)
+    filename: str = f"{filename}.json"
+    if os.path.isfile(filename):
+        with open(filename, "r") as f:
+            return json.load(f)
+    return None
 
 
 def save_json(json_data: dict, filename: str):

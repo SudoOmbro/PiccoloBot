@@ -184,6 +184,11 @@ def in_game_handler(update, context):
         return ConversationHandler.END
 
 
+def back_callback_handler(update, context):
+    delete_callback_message(update, context)
+    send_main_menu(update, context)
+
+
 def start_command_handler(update, context):
     send_main_menu(update, context)
 

@@ -106,6 +106,7 @@ class DaresCollection:
         for dare in self.pool:
             if counter < dares_per_page:
                 string += f"dare {pos}:\n{dare}\n\n"
+                counter += 1
             else:
                 counter = 0
                 pages.append(string)

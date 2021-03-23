@@ -2,7 +2,7 @@ from telegram.ext import Updater, ConversationHandler, CallbackQueryHandler, Com
 
 from telegram_stuff.bot_menu_handlers import game_start_handler, in_game_handler, States, end_command_handler, \
     start_command_handler, game_entrypoint_handler, edit_entrypoint_handler, add_dare_handler, edit_dare_menu_handler, \
-    edit_dare_attribute_handler, show_all_dares_handler, about_command_handler, error_handler
+    edit_dare_attribute_handler, show_all_dares_handler, about_command_handler, error_handler, edit_help_handler
 
 
 class PiccoloBot:
@@ -24,6 +24,7 @@ class PiccoloBot:
             states={
                 States.MAIN_EDIT_MENU: [CallbackQueryHandler(add_dare_handler, pattern="add"),
                                         CallbackQueryHandler(show_all_dares_handler, pattern="show"),
+                                        CallbackQueryHandler(edit_help_handler, pattern="help"),
                                         CallbackQueryHandler(end_command_handler, pattern="back")],
                 States.EDIT_DARE_MENU: [CallbackQueryHandler(edit_dare_menu_handler)],
                 States.EDIT_DARE_ATTRIBUTE: [MessageHandler(Filters.text, edit_dare_attribute_handler)]

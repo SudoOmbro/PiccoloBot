@@ -16,16 +16,14 @@ class PiccoloDare:
             end_text: str or None = None,
             involved_players: int = 0,
             wiggle: int = 0,
-            strings: str or None = None
+            strings: List[str] or None = None
     ):
         self.duration: int = duration  # the duration of the dare
         self.start_text: str = start_text  # the text that comes out at the start of the dare
         self.end_text: str = end_text  # the text that comes out at the end of the dare
         self.involved_players: int = involved_players  # the number of involved players
         self.wiggle: int = wiggle  # the wiggle room to the duration (duration + wiggle = max duration)
-        self.strings: List[str] or None = None
-        if strings is not None:
-            self.strings = strings.split(",")
+        self.strings: List[str] or None = strings  # the strings from which the game can randomly select from for {r}
 
     def load_from_json(self, json_data: dict):
         self.__dict__.update(json_data)
@@ -185,7 +183,7 @@ class PiccoloGame:
         # get involved players
         player_number = next_dare.involved_players
         # skip dares that can't be done for a lack of players
-        while player_number > len(players):
+        while player_number > len(self.players):
             self.dares.pop(0)
             if len(self.dares) != 0:
                 next_dare: PiccoloDare = self.dares[0]
@@ -222,7 +220,7 @@ if __name__ == "__main__":
         PiccoloDare("{1} aaaa {2} {l}", 0, None, 2),
         PiccoloDare("1:{1} 2:{2} 3:{3} 2:{2}", 0, None, 3),
         PiccoloDare("{1}, {2} lingering start ({d})", 2, "{1}, {2} lingering end ({d})", 2),
-        PiccoloDare("{1} {r}", 0, None, 1, strings="string1,string2,string3"),
+        PiccoloDare("{1} {r}", 0, None, 1, strings=["string1", "string2", "string3"]),
     ]
     players = ["jhon", "elia", "matt"]
     rounds = 2

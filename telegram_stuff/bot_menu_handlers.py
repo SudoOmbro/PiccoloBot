@@ -51,7 +51,9 @@ def add_dare_handler(update, context):
 
 def show_all_dares_handler(update, context):
     delete_callback_message(update, context)
-    send_message(update, context, text=f"saved dares:\n\n{Globals.DARES}")
+    pages = Globals.DARES.get_pages()
+    for page in pages:
+        send_message(update, context, text=page)
     send_edit_menu(update, context)
     return States.MAIN_EDIT_MENU
 
@@ -75,18 +77,52 @@ def edit_dare_attribute_handler(update, context):
     text: str = update.message.text
     field: str = context.chat_data["field"]
     dare: PiccoloDare = context.chat_data["dare"]
+    # eh, this is pretty bad, but it works
     field_type = type(dare.__dict__[field])
     if field_type == int:
         try:
             dare.__dict__[field] = int(text)
-            send_edit_dare_menu(update, context)
-            return States.EDIT_DARE_MENU
         except TypeError:
             send_message(update, context, text="Send a valid number")
+            return States.EDIT_DARE_ATTRIBUTE
+    elif field == "strings":
+        if text is not None:
+            strings = text.replace(", ", ",").split(",")
+            dare.__dict__[field] = strings
     else:
         dare.__dict__[field] = text
-        send_edit_dare_menu(update, context)
-        return States.EDIT_DARE_MENU
+    send_edit_dare_menu(update, context)
+    return States.EDIT_DARE_MENU
+
+
+def edit_help_handler(update, context):
+    delete_callback_message(update, context)
+    send_message(
+        update,
+        context,
+        text="*How do dares work?*\n"
+             "dares have many attributes, here's an explanation of what each attribute does:\n"
+             "1. *start text*: it's either just a prompt, like \"{1} does something to {2}\", "
+             "or the message the bot sends at the start of a prompt that lasts multiple turns, like "
+             "\"{1} does something until further notice\".\n"
+             "2. *end text*: it's the prompt the bot sends at the expiration of a prompt that lasts multiple turns.\n"
+             "3. *duration*: the prompt will last _duration_ turns, then expire with an _end text_ message.\n"
+             "4. *wiggle*: if _duration_ isn't 0, the prompt will last "
+             "between _duration_ and _duration + wiggle_ turns.\n"
+             "5. *involved players*: the amount of players required to make this prompt work. For example"
+             "\"{1} does something to {2}\" will require 2 involved players.\n"
+             "6. *random strings*: pool of words from which a word will be chosen and randomly to replace the {r} tags "
+             "during the generation of the prompt. The chosen words aren't consistent between turns.\n\n"
+             "*tags*\n"
+             "there are a few tags that you can use to add some flavour to your dares, here's how to use them:\n"
+             "1. *player place tags ( {1}, {2}, ... )*: these tags show where player name go in the dare's prompt.\n"
+             "2. *duration tag ( {d} )*: this tag will be replaced with the duration of the prompt.\n"
+             "3. *letter tag ( {l} )*: this tag will be replace with a random capitalized letter.\n"
+             "4. *random string tag ( {r} )*: this tag will be replace with a random string choosen "
+             "from the _random strings_ pool\n\nThat's all! Have fun!"
+    )
+    send_edit_menu(update, context)
+    return States.MAIN_EDIT_MENU
 
 
 def game_start_handler(update, context):

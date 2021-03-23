@@ -28,6 +28,7 @@ main_edit_keyboard = InlineKeyboardMarkup([
     [InlineKeyboardButton("add dare", callback_data="add")],
     # [InlineKeyboardButton("del dare", callback_data="del")],
     [InlineKeyboardButton("Show all saved dares", callback_data="show")],
+    [InlineKeyboardButton("formatting help", callback_data="help")],
     [InlineKeyboardButton("Back", callback_data="back")]
 
 ])
@@ -36,10 +37,11 @@ main_edit_keyboard = InlineKeyboardMarkup([
 edit_dare_keyboard = InlineKeyboardMarkup([
 
     [InlineKeyboardButton("edit start text", callback_data="start_text"),
-     InlineKeyboardButton("edit duration", callback_data="duration")],
-    [InlineKeyboardButton("edit end text", callback_data="end_text"),
-     InlineKeyboardButton("edit involved players", callback_data="involved_players")],
-    [InlineKeyboardButton("edit wiggle", callback_data="wiggle")],
+     InlineKeyboardButton("edit end text", callback_data="end_text")],
+    [InlineKeyboardButton("edit duration", callback_data="duration"),
+     InlineKeyboardButton("edit wiggle", callback_data="wiggle")],
+    [InlineKeyboardButton("edit involved players", callback_data="involved_players"),
+     InlineKeyboardButton("edit random strings", callback_data="strings")],
     [InlineKeyboardButton("Save & exit", callback_data="save")]
 
 ])

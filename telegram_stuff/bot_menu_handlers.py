@@ -98,6 +98,7 @@ def edit_dare_menu_handler(update, context):
         context.chat_data["field"] = cdata
         field = cdata.replace("_", " ")
         send_message(update, context, text=f"write the new value for {field}")
+        send_message(update, context, text=f"`{context.chat_data['dare'].__dict__[field]}`")
         return States.EDIT_DARE_ATTRIBUTE
 
 

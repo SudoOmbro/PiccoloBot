@@ -26,7 +26,7 @@ ingame_keyboard = InlineKeyboardMarkup([
 main_edit_keyboard = InlineKeyboardMarkup([
 
     [InlineKeyboardButton("add dare", callback_data="add"),
-     InlineKeyboardButton("edit dare", callback_data="edit")],
+     InlineKeyboardButton("edit dare", callback_data="dedit")],
     [InlineKeyboardButton("Show all saved dares", callback_data="show")],
     [InlineKeyboardButton("formatting help", callback_data="help")],
     [InlineKeyboardButton("Back", callback_data="back")]

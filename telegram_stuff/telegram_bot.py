@@ -24,7 +24,7 @@ class PiccoloBot:
             entry_points=[CallbackQueryHandler(edit_entrypoint_handler, pattern="edit")],
             states={
                 States.MAIN_EDIT_MENU: [CallbackQueryHandler(add_dare_handler, pattern="add"),
-                                        CallbackQueryHandler(edit_dare_handler, pattern="edit"),
+                                        CallbackQueryHandler(edit_dare_handler, pattern="dedit"),
                                         CallbackQueryHandler(show_all_dares_handler, pattern="show"),
                                         CallbackQueryHandler(edit_help_handler, pattern="help"),
                                         CallbackQueryHandler(back_callback_handler, pattern="back")],

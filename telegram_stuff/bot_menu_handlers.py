@@ -22,6 +22,7 @@ class States(Enum):
     GET_PLAYERS = auto()
     IN_GAME = auto()
     MAIN_EDIT_MENU = auto()
+    EDIT_DARE_GET_ID = auto()
     EDIT_DARE_MENU = auto()
     EDIT_DARE_ATTRIBUTE = auto()
 
@@ -44,6 +45,32 @@ def edit_entrypoint_handler(update, context):
 
 def add_dare_handler(update, context):
     context.chat_data["dare"] = PiccoloDare()
+    context.chat_data["new"] = True
+    delete_callback_message(update, context)
+    send_edit_dare_menu(update, context)
+    return States.EDIT_DARE_MENU
+
+
+def edit_dare_handler(update, context):
+    delete_callback_message(update, context)
+    send_message(update, context, text="type the id of the dare you want to edit")
+    return States.EDIT_DARE_GET_ID
+
+
+def edit_dare_get_dare_handler(update, context):
+    text = update.message.text
+    try:
+        position = int(text)
+        context.chat_data["dare"] = Globals.DARES.pool[position]
+    except ValueError:
+        send_message(update, context, text="invalid ID")
+        send_edit_menu(update, context)
+        return States.MAIN_EDIT_MENU
+    except IndexError:
+        send_message(update, context, text="out of bounds ID")
+        send_edit_menu(update, context)
+        return States.MAIN_EDIT_MENU
+    context.chat_data["new"] = False
     delete_callback_message(update, context)
     send_edit_dare_menu(update, context)
     return States.EDIT_DARE_MENU
@@ -62,7 +89,8 @@ def edit_dare_menu_handler(update, context):
     cdata: str = update.callback_query.data
     delete_callback_message(update, context)
     if cdata == "save":
-        Globals.DARES.add_dare(context.chat_data["dare"])
+        if context.chat_data["new"]:
+            Globals.DARES.add_dare(context.chat_data["dare"])
         Globals.DARES.save()
         send_edit_menu(update, context)
         return States.MAIN_EDIT_MENU
@@ -189,3 +217,4 @@ def error_handler(update, context):
         context.error,
         traceback.format_exc()
     )
+    return ConversationHandler.END

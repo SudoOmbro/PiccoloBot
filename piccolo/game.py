@@ -1,5 +1,5 @@
 from copy import copy
-from random import shuffle, sample, randint
+from random import shuffle, sample, randint, choice
 from typing import List
 
 from utils.filesystem import load_json, save_json
@@ -7,19 +7,25 @@ from utils.filesystem import load_json, save_json
 
 class PiccoloDare:
 
+    LETTERS = "QWERTYUIOPASDFGHJKLZXCVBNM"
+
     def __init__(
             self,
-            start_text: str = "",
+            start_text: str = "skip turn",
             duration: int = 0,
             end_text: str or None = None,
             involved_players: int = 0,
-            wiggle: int = 0
+            wiggle: int = 0,
+            strings: str or None = None
     ):
         self.duration: int = duration  # the duration of the dare
         self.start_text: str = start_text  # the text that comes out at the start of the dare
         self.end_text: str = end_text  # the text that comes out at the end of the dare
         self.involved_players: int = involved_players  # the number of involved players
         self.wiggle: int = wiggle  # the wiggle room to the duration (duration + wiggle = max duration)
+        self.strings: List[str] or None = None
+        if strings is not None:
+            self.strings = strings.split(",")
 
     def load_from_json(self, json_data: dict):
         self.__dict__.update(json_data)
@@ -30,12 +36,20 @@ class PiccoloDare:
     def _format(self, text: str, players: List[str]) -> str:
         """ format the given text with the names of the players involved and with the duration if present """
         string: str = text
+        # add player names
         pos: int = 1
         for name in players:
             string = string.replace(f"{{{pos}}}", name)
             pos += 1
+        # add the duration
         if self.duration != 0:
             string = string.replace("{d}", str(self.duration))
+        # add random letters
+        string = string.replace("{l}", self.LETTERS[randint(0, len(self.LETTERS) - 1)])
+        # add random selection from string list
+        if self.strings is not None:
+            string = string.replace("{r}", choice(self.strings))
+        # return
         return string
 
     def get_start_text(self, players: List[str]):
@@ -48,7 +62,8 @@ class PiccoloDare:
 
     def __str__(self):
         return f"duration: {self.duration} + {self.wiggle}\nstart text: {self.start_text}\n" \
-               f"end text: {self.end_text}\ninvolved players: {self.involved_players}"
+               f"end text: {self.end_text}\ninvolved players: {self.involved_players}\n" \
+               f"strings: {self.strings}"
 
 
 class DaresCollection:
@@ -75,6 +90,7 @@ class DaresCollection:
         self.pool.pop(index)
 
     def save(self):
+        """ save the collection to filename.json """
         pool: List[dict] = []
         for dare in self.pool:
             pool.append(dare.dump_to_json())
@@ -82,6 +98,24 @@ class DaresCollection:
             "dares": pool
         }
         save_json(json_data, self.filename)
+
+    def get_pages(self, dares_per_page: int = 20) -> List[str]:
+        """ get a list of pages with dares_per_page dares printed on them """
+        pages: List[str] = []
+        pos: int = 0
+        counter: int = 0
+        string: str = ""
+        for dare in self.pool:
+            if counter < dares_per_page:
+                string += f"dare {pos}:\n{dare}\n\n"
+            else:
+                counter = 0
+                pages.append(string)
+                string = f"dare {pos}:\n{dare}\n\n"
+            pos += 1
+        if len(string) != 0:
+            pages.append(string)
+        return pages
 
     def __str__(self):
         string: str = ""
@@ -149,7 +183,16 @@ class PiccoloGame:
         # get next dare
         next_dare: PiccoloDare = self.dares[0]
         # get involved players
-        involved_players: List[str] = sample(self.players, next_dare.involved_players)
+        player_number = next_dare.involved_players
+        # skip dares that can't be done for a lack of players
+        while player_number > len(players):
+            self.dares.pop(0)
+            if len(self.dares) != 0:
+                next_dare: PiccoloDare = self.dares[0]
+                player_number = next_dare.involved_players
+            else:
+                return None
+        involved_players: List[str] = sample(self.players, player_number)
         # add the next dare to the dares to return
         dares_to_return.append(next_dare.get_start_text(involved_players))
         # if the next dare has a duration, add it to the lingering dares
@@ -176,9 +219,10 @@ class PiccoloGame:
 
 if __name__ == "__main__":
     test_dares = [
-        PiccoloDare("{1} aaaa {2}", 0, None, 2),
+        PiccoloDare("{1} aaaa {2} {l}", 0, None, 2),
         PiccoloDare("1:{1} 2:{2} 3:{3} 2:{2}", 0, None, 3),
-        PiccoloDare("{1}, {2} lingering start ({d})", 2, "{1}, {2} lingering end ({d})", 2)
+        PiccoloDare("{1}, {2} lingering start ({d})", 2, "{1}, {2} lingering end ({d})", 2),
+        PiccoloDare("{1} {r}", 0, None, 1, strings="string1,string2,string3"),
     ]
     players = ["jhon", "elia", "matt"]
     rounds = 2

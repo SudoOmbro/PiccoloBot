@@ -97,7 +97,7 @@ class DaresCollection:
         }
         save_json(json_data, self.filename)
 
-    def get_pages(self, dares_per_page: int = 20) -> List[str]:
+    def get_pages(self, dares_per_page: int = 15) -> List[str]:
         """ get a list of pages with dares_per_page dares printed on them """
         pages: List[str] = []
         pos: int = 0

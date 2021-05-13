@@ -16,6 +16,7 @@ logging.basicConfig(
 )
 
 log = logging.getLogger(__name__)
+log.setLevel(logging.INFO)
 
 
 class States(Enum):
@@ -157,6 +158,8 @@ def edit_help_handler(update, context):
 def game_start_handler(update, context):
     text = update.message.text
     players = text.split("\n")
+    log.info(f"{update.effective_user.first_name} started game with {players}")
+    Globals.TOTAL_PLAYERS += len(players)
     game: PiccoloGame = PiccoloGame(
         Globals.DARES.pool,
         players,
@@ -173,6 +176,7 @@ def in_game_handler(update, context):
     game: PiccoloGame = context.chat_data["game"]
     messages = game.do_turn()
     if messages is not None:
+        Globals.DARES_COMPLETED += 1
         string = f"turn {context.chat_data['turn']}:\n\n"
         for message in messages:
             string += f"{message}\n\n"
@@ -181,6 +185,7 @@ def in_game_handler(update, context):
         return States.IN_GAME
     else:
         send_message(update, context, text="Game ended")
+        Globals.GAMES_PLAYED += 1
         send_main_menu(update, context)
         return ConversationHandler.END
 
@@ -195,7 +200,8 @@ def start_command_handler(update, context):
     send_main_menu(update, context)
 
 
-def about_command_handler(update, context):
+def about_callback_handler(update, context):
+    delete_callback_message(update, context)
     send_message(
         update,
         context,
@@ -207,6 +213,7 @@ def about_command_handler(update, context):
              "[Instagram](https://www.instagram.com/_m_o_r_b_o_/)",
         preview_off=True
     )
+    send_main_menu(update, context)
 
 
 def end_command_handler(update, context):

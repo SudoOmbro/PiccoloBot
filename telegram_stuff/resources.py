@@ -4,6 +4,7 @@ from telegram import InlineKeyboardMarkup, InlineKeyboardButton
 main_keyboard = InlineKeyboardMarkup([
 
     [InlineKeyboardButton("\U0001F37A New game", callback_data='play')],
+    [InlineKeyboardButton("\U00002753 About", callback_data='about')]
 
 ])
 
@@ -11,7 +12,8 @@ main_keyboard = InlineKeyboardMarkup([
 main_keyboard_admin = InlineKeyboardMarkup([
 
     [InlineKeyboardButton("\U0001F37A New game", callback_data='play')],
-    [InlineKeyboardButton("\U0001F4F1 Settings", callback_data='edit')]
+    [InlineKeyboardButton("\U0001F4F1 Settings", callback_data='edit')],
+    [InlineKeyboardButton("\U00002753 About", callback_data='about')]
 
 ])
 

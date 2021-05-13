@@ -1,4 +1,5 @@
 import logging
+from datetime import datetime
 
 from telegram.error import BadRequest
 
@@ -13,6 +14,9 @@ logging.basicConfig(
 )
 
 log = logging.getLogger(__name__)
+
+
+START_DATE = datetime.now()
 
 
 def send_message(update, context, text, keyboard=None, preview_off=False, markdown=True):
@@ -85,6 +89,9 @@ def send_edit_menu(update, context):
         context,
         text=f"Welcome to the edit menu!\n\n"
              f"there are currently *{len(Globals.DARES.pool)} saved dares*\n\n"
+             f"*{Globals.GAMES_PLAYED} games* have been played and *{Globals.DARES_COMPLETED} dares* "
+             f"have been completed by a total of *{Globals.TOTAL_PLAYERS} players* since "
+             f"*{START_DATE.day}/{START_DATE.month}/{START_DATE.year}*\n\n"
              f"what do you want to do?",
         keyboard=main_edit_keyboard
     )
